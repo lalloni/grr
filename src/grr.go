@@ -2,14 +2,23 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
 	"path/filepath"
 )
 
-var verbose *bool = flag.Bool("v", false, "Be (very) verbose.")
-var really *bool = flag.Bool("R", false, "Really grr.")
+var verbose *bool = flag.Bool("v", false, "Be (very) verbose")
+var jump *int64 = flag.Int64("j", 32, "Random jump maximum size")
+var really *bool = flag.Bool("R", false, "Really do grr")
+
+func init() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: grr [OPTS] PATH...\nPATH Is one or more filesystem paths\nOPTS Is one or more of the following:\n")
+		flag.PrintDefaults()
+	}
+}
 
 func main() {
 
@@ -17,10 +26,15 @@ func main() {
 
 	targets := flag.Args()
 
+	if len(targets) == 0 {
+		flag.Usage()
+		os.Exit(0)
+	}
+
 	for i := range targets {
 		target := targets[i]
 		if *verbose {
-			log.Printf("Processing target [%v]...", target)
+			log.Printf("Processing target %v", target)
 		}
 		filepath.Walk(target, func(path string, info os.FileInfo, err error) error {
 			if err == nil {
@@ -42,7 +56,7 @@ func main() {
 						if e != nil {
 							log.Printf("Can't seek %v: %v", path, e.Error())
 						} else {
-							for ; pos+1 < info.Size(); pos = pos + rand.Int63n(16) {
+							for ; pos < info.Size(); pos = pos + rand.Int63n(*jump) + 1 {
 								if *verbose {
 									log.Printf("Seeking to %v", pos)
 								}
