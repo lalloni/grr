@@ -9,13 +9,18 @@ import (
 	"path/filepath"
 )
 
+const usage = `Usage: grr [OPTS] PATH...
+PATH Is one or more filesystem paths
+OPTS Is one or more of the following supported options:
+`
+
 var verbose *bool = flag.Bool("v", false, "Be (very) verbose")
 var jump *int64 = flag.Int64("j", 32, "Random jump maximum size")
 var really *bool = flag.Bool("R", false, "Really do grr")
 
 func init() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: grr [OPTS] PATH...\nPATH Is one or more filesystem paths\nOPTS Is one or more of the following:\n")
+		fmt.Fprintf(os.Stderr, usage)
 		flag.PrintDefaults()
 	}
 }
@@ -47,8 +52,8 @@ func main() {
 						log.Printf("Trying to grr %v", path)
 					}
 					buf := make([]byte, 1)
-					file, e := os.OpenFile(path, os.O_WRONLY, info.Mode())
 					wrote := false
+					file, e := os.OpenFile(path, os.O_WRONLY, info.Mode())
 					if e != nil {
 						log.Printf("Can't open %v: %v", path, e.Error())
 					} else {
