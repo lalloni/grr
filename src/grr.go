@@ -10,12 +10,15 @@ import (
 )
 
 const usage = `Usage: grr [OPTS] PATH...
-PATH Is one or more filesystem paths
-OPTS Is one or more of the following supported options:
+Corrupts all files in the provided paths by skipping a random number of bytes
+and writing one random byte in a loop until the end of every file.
+A PATH can point to a file or a directory in which case the whole tree of files 
+will be corrupted.
+OPTS are zero or more of the following:
 `
 
 var verbose *bool = flag.Bool("v", false, "Be (very) verbose")
-var jump *int64 = flag.Int64("j", 32, "Random jump maximum size")
+var jump *int64 = flag.Int64("s", 32, "Maximum skip size")
 var really *bool = flag.Bool("R", false, "Really do grr")
 
 func init() {
